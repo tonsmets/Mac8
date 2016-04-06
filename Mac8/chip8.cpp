@@ -82,12 +82,30 @@ void Chip8::loadGame(std::string filename) {
     
 }
 
+void Chip8::debugRender()
+{
+    // Draw
+    for(int y = 0; y < 32; ++y)
+    {
+        for(int x = 0; x < 64; ++x)
+        {
+            if(gfx[(y*64) + x] == 0)
+                printf("0");
+            else
+                printf(" ");
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
 /*
  Opcodes fetched from: https://en.wikipedia.org/wiki/CHIP-8#Opcode_table
  */
 void Chip8::emulateCycle() {
     // Fetch opcode
     opcode = memory[pc] << 8 | memory[pc + 1];
+    //printf ("Opcode : 0x%X\n", opcode);
     
     // Decode opcode
     switch(opcode & 0xF000)
@@ -97,7 +115,9 @@ void Chip8::emulateCycle() {
             {
                 case 0x0000: // 00E0: Clears the screen.
                     // Clear display
-                    memset(gfx, 0, sizeof(gfx));
+                    for(int i = 0; i < 2048; ++i)
+                        gfx[i] = 0x0;
+                    drawFlag = true;
                     pc += 2;
                     break;
                 case 0x000E: // 00EE: Returns from subroutine. (reverse of 0xA000)
@@ -158,12 +178,15 @@ void Chip8::emulateCycle() {
                     break;
                 case 0x0001: // 8XY1: Sets VX to VX or VY.
                     V[(opcode & 0x0F00) >> 8] |= V[(opcode & 0x00F0) >> 4];
+                    pc += 2;
                     break;
                 case 0x0002: // 8XY2: Sets VX to VX and VY.
                     V[(opcode & 0x0F00) >> 8] &= V[(opcode & 0x00F0) >> 4];
+                    pc += 2;
                     break;
                 case 0x0003: // 8XY3: Sets VX to VX xor VY.
                     V[(opcode & 0x0F00) >> 8] ^= V[(opcode & 0x00F0) >> 4];
+                    pc += 2;
                     break;
                 case 0x0004: // 8XY4: Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
                     if(V[(opcode & 0x00F0) >> 4] > (0xFF - V[(opcode & 0x0F00) >> 8])) {
@@ -209,22 +232,32 @@ void Chip8::emulateCycle() {
                     printf ("Unknown opcode [0x0000]: 0x%X\n", opcode);
             }
             break;
-        case 0x9000:
-            // Execute opcode
+        case 0x9000: // 9XY0: Skips the next instruction if VX doesn't equal VY.
+            if(V[(opcode & 0x0F00) >> 8] != V[(opcode & 0x00F0) >> 4]) {
+                pc += 4;
+            }
+            else {
+                pc += 2;
+            }
             break;
-        case 0xA000: // ANNN: Sets I to the address NNN
-            // Execute opcode
+        case 0xA000: // ANNN: Sets I to the address NNN.
             I = opcode & 0x0FFF;
             pc += 2;
             break;
-        case 0xB000:
-            // Execute opcode
+        case 0xB000: // BNNN: Jumps to the address NNN plus V0.
+            pc = (opcode & 0x0FFF) + V[0];
             break;
-        case 0xC000:
-            // Execute opcode
+        case 0xC000: // CXNN: Sets VX to the result of a bitwise and operation on a random number and NN.
+            V[(opcode & 0x0F00) >> 8] = (rand() % 0xFF) & (opcode & 0x00FF);
+            pc += 2;
             break;
         case 0xD000:
             {
+                // DXYN: Sprites stored in memory at location in index register (I), 8bits wide. Wraps around the screen.
+                // If when drawn, clears a pixel, register VF is set to 1 otherwise it is zero.
+                // All drawing is XOR drawing (i.e. it toggles the screen pixels). Sprites are drawn starting at position VX, VY.
+                // N is the number of 8bit rows that need to be drawn.
+                // If N is greater than 1, second line continues at position VX, VY+1, and so on.
                 unsigned short x = V[(opcode & 0x0F00) >> 8];
                 unsigned short y = V[(opcode & 0x00F0) >> 4];
                 unsigned short height = opcode & 0x000F;
@@ -252,11 +285,21 @@ void Chip8::emulateCycle() {
         case 0xE000:
             switch(opcode & 0x00FF)
             {
-                case 0x009E:
-                    // Execute opcode
+                case 0x009E: // EX9E: Skips the next instruction if the key stored in VX is pressed.
+                    if(key[V[(opcode & 0x0F00) >> 8]] != 0) {
+                        pc += 4;
+                    }
+                    else {
+                        pc += 2;
+                    }
                     break;
-                case 0x00A1:
-                    // Execute opcode
+                case 0x00A1: // EXA1: Skips the next instruction if the key stored in VX isn't pressed.
+                    if(key[V[(opcode & 0x0F00) >> 8]] == 0) {
+                        pc += 4;
+                    }
+                    else {
+                        pc += 2;
+                    }
                     break;
                 default:
                     printf ("Unknown opcode [0x0000]: 0x%X\n", opcode);
@@ -265,38 +308,83 @@ void Chip8::emulateCycle() {
         case 0xF000:
             switch(opcode & 0x00FF)
             {
-                case 0x0007:
-                    // Execute opcode
+                case 0x0007: // FX07: Sets VX to the value of the delay timer
+                    V[(opcode & 0x0F00) >> 8] = delay_timer;
+                    pc += 2;
                     break;
-                case 0x000A:
-                    // Execute opcode
+                    
+                case 0x000A: // FX0A: A key press is awaited, and then stored in VX
+                    {
+                        bool keyPress = false;
+                        
+                        for(int i = 0; i < 16; ++i)
+                        {
+                            if(key[i] != 0)
+                            {
+                                V[(opcode & 0x0F00) >> 8] = i;
+                                keyPress = true;
+                            }
+                        }
+                        
+                        // If we didn't received a keypress, skip this cycle and try again.
+                        if(!keyPress)
+                            return;
+                        
+                        pc += 2;
+                    }
                     break;
-                case 0x0015:
-                    // Execute opcode
+                    
+                case 0x0015: // FX15: Sets the delay timer to VX
+                    delay_timer = V[(opcode & 0x0F00) >> 8];
+                    pc += 2;
                     break;
-                case 0x0018:
-                    // Execute opcode
+                    
+                case 0x0018: // FX18: Sets the sound timer to VX
+                    sound_timer = V[(opcode & 0x0F00) >> 8];
+                    pc += 2;
                     break;
-                case 0x001E:
-                    // Execute opcode
+                    
+                case 0x001E: // FX1E: Adds VX to I
+                    if(I + V[(opcode & 0x0F00) >> 8] > 0xFFF)	// VF is set to 1 when range overflow (I+VX>0xFFF), and 0 when there isn't.
+                        V[0xF] = 1;
+                    else
+                        V[0xF] = 0;
+                    I += V[(opcode & 0x0F00) >> 8];
+                    pc += 2;
                     break;
-                case 0x0029:
-                    // Execute opcode
+                    
+                case 0x0029: // FX29: Sets I to the location of the sprite for the character in VX. Characters 0-F (in hexadecimal) are represented by a 4x5 font
+                    I = V[(opcode & 0x0F00) >> 8] * 0x5;
+                    pc += 2;
                     break;
-                case 0x0033:
+                    
+                case 0x0033: // FX33: Stores the Binary-coded decimal representation of VX at the addresses I, I plus 1, and I plus 2
                     memory[I]     = V[(opcode & 0x0F00) >> 8] / 100;
                     memory[I + 1] = (V[(opcode & 0x0F00) >> 8] / 10) % 10;
                     memory[I + 2] = (V[(opcode & 0x0F00) >> 8] % 100) % 10;
                     pc += 2;
                     break;
-                case 0x0055:
-                    // Execute opcode
+                    
+                case 0x0055: // FX55: Stores V0 to VX in memory starting at address I
+                    for (int i = 0; i <= ((opcode & 0x0F00) >> 8); ++i)
+                        memory[I + i] = V[i];	
+                    
+                    // On the original interpreter, when the operation is done, I = I + X + 1.
+                    I += ((opcode & 0x0F00) >> 8) + 1;
+                    pc += 2;
                     break;
-                case 0x0065:
-                    // Execute opcode
+                    
+                case 0x0065: // FX65: Fills V0 to VX with values from memory starting at address I					
+                    for (int i = 0; i <= ((opcode & 0x0F00) >> 8); ++i)
+                        V[i] = memory[I + i];			
+                    
+                    // On the original interpreter, when the operation is done, I = I + X + 1.
+                    I += ((opcode & 0x0F00) >> 8) + 1;
+                    pc += 2;
                     break;
+                    
                 default:
-                    printf ("Unknown opcode [0x0000]: 0x%X\n", opcode);
+                    printf ("Unknown opcode [0xF000]: 0x%X\n", opcode);
             }
             break;
         default:
@@ -313,8 +401,4 @@ void Chip8::emulateCycle() {
             printf("BEEP!\n");
         --sound_timer;
     }
-}
-
-void Chip8::setKeys() {
-    
 }

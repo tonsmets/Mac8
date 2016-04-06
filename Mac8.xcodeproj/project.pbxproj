@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		E6BFF70C1CB55BDC00E3D9E4 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E6BFF70B1CB55BDC00E3D9E4 /* main.cpp */; };
 		E6BFF7141CB55C1100E3D9E4 /* chip8.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E6BFF7121CB55C1100E3D9E4 /* chip8.cpp */; };
+		E6BFF7161CB58F2300E3D9E4 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E6BFF7151CB58F2300E3D9E4 /* OpenGL.framework */; };
+		E6BFF7181CB58F2E00E3D9E4 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E6BFF7171CB58F2E00E3D9E4 /* GLUT.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,6 +30,8 @@
 		E6BFF70B1CB55BDC00E3D9E4 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		E6BFF7121CB55C1100E3D9E4 /* chip8.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chip8.cpp; sourceTree = "<group>"; };
 		E6BFF7131CB55C1100E3D9E4 /* chip8.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = chip8.hpp; sourceTree = "<group>"; };
+		E6BFF7151CB58F2300E3D9E4 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		E6BFF7171CB58F2E00E3D9E4 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +39,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E6BFF7181CB58F2E00E3D9E4 /* GLUT.framework in Frameworks */,
+				E6BFF7161CB58F2300E3D9E4 /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,6 +50,8 @@
 		E6BFF6FF1CB55BDC00E3D9E4 = {
 			isa = PBXGroup;
 			children = (
+				E6BFF7171CB58F2E00E3D9E4 /* GLUT.framework */,
+				E6BFF7151CB58F2300E3D9E4 /* OpenGL.framework */,
 				E6BFF70A1CB55BDC00E3D9E4 /* Mac8 */,
 				E6BFF7091CB55BDC00E3D9E4 /* Products */,
 			);
@@ -213,6 +221,7 @@
 		E6BFF7101CB55BDC00E3D9E4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -220,6 +229,7 @@
 		E6BFF7111CB55BDC00E3D9E4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
