@@ -22,7 +22,7 @@
 class Chip8 {
 private:
     unsigned short opcode;
-    unsigned char memory[0xFFFF];
+    unsigned char memory[0xFFF];
     unsigned char V[16];
     unsigned short I;
     unsigned short pc;
