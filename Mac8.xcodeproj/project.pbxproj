@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E6BFF70C1CB55BDC00E3D9E4 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E6BFF70B1CB55BDC00E3D9E4 /* main.cpp */; };
+		E6BFF7141CB55C1100E3D9E4 /* chip8.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E6BFF7121CB55C1100E3D9E4 /* chip8.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +26,8 @@
 /* Begin PBXFileReference section */
 		E6BFF7081CB55BDC00E3D9E4 /* Mac8 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Mac8; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6BFF70B1CB55BDC00E3D9E4 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		E6BFF7121CB55C1100E3D9E4 /* chip8.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chip8.cpp; sourceTree = "<group>"; };
+		E6BFF7131CB55C1100E3D9E4 /* chip8.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = chip8.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +61,8 @@
 			isa = PBXGroup;
 			children = (
 				E6BFF70B1CB55BDC00E3D9E4 /* main.cpp */,
+				E6BFF7121CB55C1100E3D9E4 /* chip8.cpp */,
+				E6BFF7131CB55C1100E3D9E4 /* chip8.hpp */,
 			);
 			path = Mac8;
 			sourceTree = "<group>";
@@ -118,6 +123,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E6BFF7141CB55C1100E3D9E4 /* chip8.cpp in Sources */,
 				E6BFF70C1CB55BDC00E3D9E4 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
