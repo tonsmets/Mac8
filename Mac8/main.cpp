@@ -22,7 +22,7 @@ void reshape(int, int);
 void keyboardUp(unsigned char key, int x, int y);
 void keyboardDown(unsigned char key, int x, int y);
 
-char* fileName = (char*)"/Volumes/Macintosh HD/OneDrive/Documenten/Chip8/CONNECT4";
+char* fileName = (char*)"/Volumes/Macintosh HD/OneDrive/Documenten/Chip8/PONG";
 
 int main(int argc, char ** argv) {
     mychip.initialize();
